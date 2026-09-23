@@ -3217,7 +3217,24 @@ dialog:has(.dialog-copy .eyebrow) > img {
     padding: 12px;
   }
 }
+/* Only opacity and a small translation: no zoom or changes to photo cropping. */
+img.image-pending {
+  opacity: 0;
+}
+.brand img,
+.photo-thumbnails img,
+.release-thumb img {
+  --image-travel: 6px;
+}
+@media (max-width: 760px) {
+  img {
+    --image-travel: 14px;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
+  img.image-pending {
+    opacity: 1;
+  }
   *,
   *::before,
   *::after {

@@ -47,6 +47,8 @@ The catalogue includes Hot Toys Iron Man Mark LXXXV (MMS528D30), Captain America
 
 The design uses an asymmetric Bento grid, corner radii of at most 8 px, no decorative shadows, no hover image scaling, and no headline/subtitle/button hero composition.
 
+All images reveal after decoding and entering the viewport, with a 950 ms fade and a small upward motion. This also covers filtered results, dialogs and upload previews. Gallery changes preload the next photograph before fading out the current one; rapid selections keep the latest choice. Reduced-motion preferences show images immediately.
+
 ## Supplied photo collection
 
 12 user-supplied photographs are grouped into seven subjects, with the original watermarks retained. New detail galleries support keyboard-operable thumbnails. Chinese character and costume names are searchable. Unverified prices are omitted and sorted after entries with a reference price.

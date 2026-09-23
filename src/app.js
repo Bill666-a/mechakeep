@@ -1,4 +1,5 @@
 import { models, sampleBuilds, releases } from "./data.js";
+import { replaceImage } from "./image-motion.js";
 
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
@@ -428,15 +429,19 @@ function setupForm() {
     }
   });
 }
-document.addEventListener("click", (e) => {
+document.addEventListener("click", async (e) => {
   const photo = e.target.closest("[data-photo]");
   if (photo) {
     const m = models.find((m) => m.id === photo.dataset.photoModel);
     const index = Number(photo.dataset.photo);
     if (!m?.gallery?.[index]) return;
     const image = $("#product-main-photo");
-    image.src = `assets/${m.gallery[index]}.webp`;
-    image.alt = `${m.name} · photograph ${index + 1} of ${m.gallery.length}`;
+    const changed = await replaceImage(
+      image,
+      `assets/${m.gallery[index]}.webp`,
+      `${m.name} · photograph ${index + 1} of ${m.gallery.length}`,
+    );
+    if (!changed) return;
     $$("[data-photo]").forEach((b) =>
       b.setAttribute("aria-pressed", String(b === photo)),
     );
