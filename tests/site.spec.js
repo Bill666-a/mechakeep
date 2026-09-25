@@ -8,7 +8,7 @@ test("homepage and every route load without broken images or browser errors", as
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Good company.",
+    "Hot Toys 与机甲模型",
   );
   for (const section of await page.locator(".reveal").all()) {
     await section.scrollIntoViewIfNeeded();
@@ -172,7 +172,7 @@ test("release filtering, mobile navigation, overflow and reduced motion", async 
   await page.getByRole("button", { name: "Open navigation" }).click();
   await page
     .getByRole("navigation")
-    .getByRole("link", { name: "Releases" })
+    .getByRole("link", { name: "发售日历" })
     .click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "Good things. On the horizon.",
