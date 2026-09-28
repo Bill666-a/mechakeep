@@ -19,7 +19,7 @@ export const models = [
     detail:
       "Hot Toys MMS528D30 is a 1/6-scale diecast figure approximately 32.5 cm tall, with interchangeable Tony Stark and helmeted portraits, articulated armour and illuminated details.",
     cnName: "钢铁侠 MK85 普通版",
-    character: "Tony Stark / 托尼·斯塔克",
+    character: "Tony Stark",
     credit: "ALEX_模玩有品",
     height: "32.5 cm",
     gallery: ["iron-man-mk85"],
@@ -53,7 +53,7 @@ export const models = [
     detail:
       "MMS783 updates this sixth-scale figure with a Steve Rogers portrait featuring rolling eyes, a helmeted head with interchangeable lower faces and a newly tailored suit. The supplied photographs show both portrait options.",
     cnName: "美国队长 · 潜行战衣 2.0",
-    character: "Steve Rogers / 史蒂夫·罗杰斯",
+    character: "Steve Rogers",
     credit: "Y-N-T / yu_nai_tou",
     height: "31 cm",
     userPhoto: true,
@@ -85,7 +85,7 @@ export const models = [
     detail:
       "MMS892 is a 1/6-scale figure approximately 28.5 cm tall. Its fabric suit, four pairs of interchangeable eye pieces, web effects and magnetic web-shooters reproduce the Brand New Day design.",
     cnName: "蜘蛛侠 · 崭新之日战衣",
-    character: "Peter Parker / 彼得·帕克",
+    character: "Peter Parker",
     credit: "小宅的晚间播报",
     height: "28.5 cm",
     userPhoto: true,
@@ -117,7 +117,7 @@ export const models = [
     detail:
       "The 1/6-scale figure is approximately 28 cm tall, with a sculpted portrait, interchangeable hands and magic-effect accessories. Standard and Deluxe sets share the figure; the supplied portrait alone does not establish which set was photographed.",
     cnName: "绯红女巫 / 旺达",
-    character: "Wanda Maximoff / 旺达·马克西莫夫",
+    character: "Wanda Maximoff",
     credit: "B-L",
     height: "28 cm",
     editionNote:
@@ -155,7 +155,7 @@ export const models = [
     detail:
       "The original TMS075 figure stands approximately 29 cm tall at 1/6 scale. It includes a wired fabric cape, illuminated eyes and crescent blades. These photographs show the original armoured release, not the later Mr. Knight suit or Artisan edition.",
     cnName: "月光骑士 1.0",
-    character: "Marc Spector / Steven Grant · 马克·斯佩克特 / 史蒂文·格兰特",
+    character: "Marc Spector / Steven Grant",
     credit: "B-L",
     height: "29 cm",
     userPhoto: true,
@@ -187,7 +187,7 @@ export const models = [
     detail:
       "This updated Endgame figure is approximately 28.5 cm tall at 1/6 scale. Product references MMS761 and MMS762AE share articulated mechanical legs and a Peter Parker portrait; their sculpted-hair and Artisan portraits differ.",
     cnName: "钢铁蜘蛛侠 2.0",
-    character: "Peter Parker / 彼得·帕克",
+    character: "Peter Parker",
     credit: "Jun_ / JUN",
     height: "28.5 cm",
     editionNote:
@@ -225,7 +225,7 @@ export const models = [
     detail:
       "The approximately 32 cm figure is offered as MMS758D65 and the MMS759D66 Deluxe set. The supplied photographs include the illuminated industrial base associated with the Deluxe set, so the page describes the photographed display rather than assuming a standard box.",
     cnName: "钢铁侠 MK42 2.0",
-    character: "Tony Stark / 托尼·斯塔克",
+    character: "Tony Stark",
     credit: "森模都玩 / CLOCK IN",
     height: "32 cm",
     editionNote:
@@ -446,7 +446,7 @@ export const sampleBuilds = [
     model: "scarlet-witch",
     image: "assets/scarlet-witch.webp",
     description:
-      "绯红女巫 / 旺达 · Doctor Strange in the Multiverse of Madness. Photography credited to B-L in the supplied image or filename. Shared here as a user-provided photo reference.",
+      "Scarlet Witch / Wanda Maximoff · Doctor Strange in the Multiverse of Madness. Photography credited to B-L in the supplied image or filename. Shared here as a user-provided photo reference.",
     sample: true,
   },
   {
@@ -456,7 +456,7 @@ export const sampleBuilds = [
     model: "spider-man-brand-new-day",
     image: "assets/spider-man-brand-new-day.webp",
     description:
-      "蜘蛛侠 · 崭新之日战衣 · Spider-Man: Brand New Day. Photography credited to 小宅的晚间播报 in the supplied image or filename. Shared here as a user-provided photo reference.",
+      "Spider-Man · Brand New Day Suit · Spider-Man: Brand New Day. Photography credited to 小宅的晚间播报 in the supplied image or filename. Shared here as a user-provided photo reference.",
     sample: true,
   },
   {
@@ -466,7 +466,7 @@ export const sampleBuilds = [
     model: "captain-america-stealth",
     image: "assets/captain-america-stealth-helmet.webp",
     description:
-      "美国队长 · 潜行战衣 2.0 · Captain America: The Winter Soldier. Photography credited to Y-N-T / yu_nai_tou in the supplied image or filename. Shared here as a user-provided photo reference.",
+      "Captain America · Stealth S.T.R.I.K.E. Suit 2.0 · Captain America: The Winter Soldier. Photography credited to Y-N-T / yu_nai_tou in the supplied image or filename. Shared here as a user-provided photo reference.",
     sample: true,
   },
   {
@@ -476,7 +476,7 @@ export const sampleBuilds = [
     model: "moon-knight",
     image: "assets/moon-knight-detail.webp",
     description:
-      "月光骑士 1.0 · Marvel Studios’ Moon Knight. Photography credited to B-L in the supplied image or filename. Shared here as a user-provided photo reference.",
+      "Moon Knight 1.0 · Marvel Studios’ Moon Knight. Photography credited to B-L in the supplied image or filename. Shared here as a user-provided photo reference.",
     sample: true,
   },
   {
@@ -486,7 +486,7 @@ export const sampleBuilds = [
     model: "iron-spider-2",
     image: "assets/iron-spider-action.webp",
     description:
-      "钢铁蜘蛛侠 2.0 · Avengers: Endgame. Photography credited to Jun_ / JUN in the supplied image or filename. Shared here as a user-provided photo reference.",
+      "Iron Spider 2.0 · Avengers: Endgame. Photography credited to Jun_ / JUN in the supplied image or filename. Shared here as a user-provided photo reference.",
     sample: true,
   },
   {
@@ -496,7 +496,7 @@ export const sampleBuilds = [
     model: "iron-man-mk42",
     image: "assets/iron-man-mk42-action.webp",
     description:
-      "钢铁侠 MK42 2.0 · Iron Man 3. Photography credited to 森模都玩 / CLOCK IN in the supplied image or filename. Shared here as a user-provided photo reference.",
+      "Iron Man Mark XLII 2.0 · Iron Man 3. Photography credited to 森模都玩 / CLOCK IN in the supplied image or filename. Shared here as a user-provided photo reference.",
     sample: true,
   },
   {
@@ -506,7 +506,7 @@ export const sampleBuilds = [
     model: "iron-man",
     image: "assets/iron-man-mk85.webp",
     description:
-      "钢铁侠 MK85 普通版 · Avengers: Endgame · Regular Edition. Photography credited to ALEX_模玩有品 in the supplied image or filename. Shared here as a user-provided photo reference.",
+      "Iron Man Mark LXXXV · Avengers: Endgame · Regular Edition. Photography credited to ALEX_模玩有品 in the supplied image or filename. Shared here as a user-provided photo reference.",
     sample: true,
   },
 ];

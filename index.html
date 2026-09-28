@@ -1,24 +1,32 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f7f7f5" />
+    <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="浏览 Hot Toys 超级英雄、环太平洋机甲与高达模型，查看藏家摄影和模型资料。"
+      content="Explore Hot Toys superheroes, Pacific Rim Jaegers and Gundam collectibles through detailed specifications and collector photography."
     />
-    <title>MechaKeep — Hot Toys 与机甲模型</title>
+    <title>MechaKeep — Hot Toys &amp; Mecha Collectibles</title>
     <link rel="icon" type="image/svg+xml" href="./assets/mark.svg" />
     <link rel="stylesheet" href="./src/styles.css" />
+    <link rel="stylesheet" href="./src/industrial.css" />
   </head>
   <body>
-    <a class="skip-link" href="#main">跳转到主要内容</a>
+    <a class="skip-link" href="#main">Skip to main content</a>
     <header class="site-header" id="header"></header>
     <main id="main" tabindex="-1"></main>
+    <noscript
+      ><p class="container">
+        Enable JavaScript to explore the model galleries and technical
+        specifications.
+      </p></noscript
+    >
     <footer id="footer"></footer>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <dialog id="build-dialog" aria-labelledby="dialog-title"></dialog>
+    <dialog id="spec-dialog" aria-labelledby="spec-dialog-title"></dialog>
     <script type="module" src="./src/app.js"></script>
   </body>
 </html>

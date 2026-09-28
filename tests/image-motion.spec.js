@@ -12,7 +12,7 @@ test("slow images reveal after loading and offscreen photographs reveal on scrol
     await route.continue();
   });
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  const hero = page.locator('.bento-grid img[src*="iron-man-mk85"]');
+  const hero = page.locator('.flagship-hero img[src*="iron-man-mk85"]');
   try {
     await expect(hero).toHaveCSS("opacity", "0");
   } finally {
@@ -63,4 +63,52 @@ test("latest gallery selection wins and reduced motion immediately shows images"
     await expect(image).toHaveCSS("opacity", "1");
     expect(await image.evaluate((img) => img.getAnimations().length)).toBe(0);
   }
+});
+
+test("home tiles and copy enter in order, and reduced motion keeps them visible", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const tiles = page.locator(".bento-grid .photo-tile");
+  await expect(tiles).toHaveCount(4);
+  await page.locator(".bento-intro").scrollIntoViewIfNeeded();
+  await expect(page.locator(".bento-intro")).toHaveClass(/is-visible/);
+  await tiles.first().scrollIntoViewIfNeeded();
+  await expect(tiles.first()).toHaveClass(/is-visible/);
+  await expect(page.locator(".bento-intro h2")).toHaveCSS(
+    "animation-name",
+    "content-rise",
+  );
+  await page.locator(".bento-directory").scrollIntoViewIfNeeded();
+  await expect(page.locator(".bento-directory")).toHaveClass(/is-visible/);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.reload();
+  for (const element of await page
+    .locator(".bento-intro, .bento-grid .photo-tile")
+    .all()) {
+    await expect(element).toHaveCSS("opacity", "1");
+  }
+  await expect(page.locator(".bento-intro h2")).toHaveCSS(
+    "animation-name",
+    "none",
+  );
+});
+
+test("flagship specs open as a keyboard dismissible gallery", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByRole("button", { name: /View technical specifications/ })
+    .click();
+  const dialog = page.locator("#spec-dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("MMS528D30");
+  await expect(dialog).toContainText("32.5 cm");
+  await expect(dialog.locator("#spec-main-photo")).toHaveAttribute(
+    "src",
+    "assets/iron-man-mk85.webp",
+  );
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
 });

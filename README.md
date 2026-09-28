@@ -39,13 +39,13 @@ Product names identify actual model kits. Reference prices are illustrative. The
 
 Strike Freedom and inner-frame imagery: [GUNDAM.INFO / Bandai Spirits](https://en.gundam.info/content/mgex/strikefreedom/). Hot Toys product photography: [Toys Buying Agent](https://www.toysbuyingagent.com/). Other model images: [USA Gundam Store](https://www.usagundamstore.com/), with source URLs recorded in `public/assets/sources.json`. Copyright and trademarks remain with their respective owners. These assets are used for this educational design prototype; public or commercial reuse requires appropriate permissions. MechaKeep is not affiliated with these companies.
 
-The interface follows a restrained white/grey palette with small blue accents. All animations use CSS, IntersectionObserver, or requestAnimationFrame. The site remains fully operable when `prefers-reduced-motion` is enabled.
+The interface uses a pure-black canvas, #161617 panels, subtle highlight borders and blue actions. All motion shares `cubic-bezier(0.16, 1, 0.3, 1)` through the CSS `--motion` token. Reduced-motion preferences immediately reveal content and stop active image and dialog animations.
 
 ## Collection update
 
 The catalogue includes Hot Toys Iron Man Mark LXXXV (MMS528D30), Captain America (MMS536), Thor (MMS557), Spider-Man Classic Suit (VGM48), Bandai Soul of Chogokin Gipsy Danger (GX-77), and six Gundam kits. New entries use product references instead of unverified release dates. Gipsy Danger is displayed by its approximate 23 cm height, not an invented scale.
 
-The design uses an asymmetric Bento grid, corner radii of at most 8 px, no decorative shadows, no hover image scaling, and no headline/subtitle/button hero composition.
+The September 28, 2026 redesign supersedes the earlier small-radius layout: a 48 px glass navigation bar, product hero, 12-column technical Bento grid, 24 px cards, 28 px native dialogs, and subtle 1.012 card scaling on hover-capable devices. Collection photos and full galleries preserve their original framing; the hero and paint-detail panel use presentation crops with photographer credit.
 
 All images reveal after decoding and entering the viewport, with a 950 ms fade and a small upward motion. This also covers filtered results, dialogs and upload previews. Gallery changes preload the next photograph before fading out the current one; rapid selections keep the latest choice. Reduced-motion preferences show images immediately.
 
@@ -66,3 +66,17 @@ This repository includes `.github/workflows/deploy-pages.yml`, which builds the 
 3. Push to `main` or `master`, then open the URL shown in the workflow run. For a repository named `mechakeep`, it is usually `https://你的用户名.github.io/mechakeep/`.
 
 The site is a static frontend. Favourites and submitted builds remain in the browser's local storage; GitHub Pages does not provide user accounts or a shared database.
+
+## Frontend structure
+
+- `index.html`: semantic document shell, sticky header, main region, footer, two native dialogs and module entry.
+- `src/app.js`: data-backed page HTML, catalogue search/filtering, model-specification galleries and frame/armour switching.
+- `src/styles.css`: shared layout and existing route components.
+- `src/industrial.css`: dark design tokens, flagship hero, technical Bento panels, dialog surfaces, hover states and responsive layouts.
+- `src/motion.js`: shared easing/preference and single-use viewport reveals.
+- `src/image-motion.js`: decode-aware image entrances and cancellable photo replacement.
+- `src/dialogs.js`: native dialog opening/closing, Escape, backdrop dismissal and reduced-motion handling.
+
+Use the header search and filter controls to focus the relevant catalogue control. Every model card exposes its specification dialog. Multi-image models show their actual supplied angles; a single-photo model retains one angle instead of inventing additional images. The structure panel switches between the existing MGEX inner-frame and armoured photographs; it is a photo comparison, not a simulated 3D joint rig. Product statistics come from the catalogue metadata, so the design does not invent a joint count.
+
+No new runtime library is required. The development commands and GitHub Pages workflow above remain unchanged. Local edits become public only after they are pushed and the Pages deployment succeeds.

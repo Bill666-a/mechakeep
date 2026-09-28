@@ -3,14 +3,14 @@
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
     sans-serif;
-  color: #1d1d1f;
-  background: #fff;
+  color: #f5f5f7;
+  background: #000000;
   font-synthesis: none;
-  --ink: #1d1d1f;
-  --muted: #737376;
+  --ink: #f5f5f7;
+  --muted: #86868b;
   --blue: #0071e3;
-  --paper: #f5f5f7;
-  --line: rgba(0, 0, 0, 0.08);
+  --paper: #161617;
+  --line: rgba(255, 255, 255, 0.08);
 }
 * {
   box-sizing: border-box;
@@ -146,7 +146,7 @@ select:focus-visible {
 }
 .text-link svg,
 .button svg {
-  transition: transform 0.3s;
+  transition: transform 0.3s var(--motion);
 }
 .text-link:hover svg,
 .button:hover svg {
@@ -168,8 +168,8 @@ select:focus-visible {
   font-size: 13px;
   font-weight: 500;
   transition:
-    transform 0.25s,
-    background 0.25s;
+    transform 0.25s var(--motion),
+    background 0.25s var(--motion);
 }
 .button:hover {
   transform: translateY(-1px);
@@ -217,8 +217,8 @@ select:focus-visible {
   z-index: 40;
   background: rgba(247, 247, 245, 0.95);
   transition:
-    background 0.3s,
-    box-shadow 0.3s;
+    background 0.3s var(--motion),
+    box-shadow 0.3s var(--motion);
 }
 .site-header.scrolled {
   background: rgba(255, 255, 255, 0.82);
@@ -256,7 +256,7 @@ select:focus-visible {
 .nav-shell nav a {
   font-size: 12px;
   color: #737376;
-  transition: color 0.25s;
+  transition: color 0.25s var(--motion);
   position: relative;
   padding: 25px 0;
 }
@@ -464,8 +464,8 @@ select:focus-visible {
   display: grid;
   place-items: center;
   transition:
-    background 0.3s,
-    transform 0.3s;
+    background 0.3s var(--motion),
+    transform 0.3s var(--motion);
 }
 .hero-caption:hover .circle-arrow {
   background: white;
@@ -514,7 +514,7 @@ select:focus-visible {
   letter-spacing: 0.2em;
 }
 .entrance {
-  animation: enter 0.85s both;
+  animation: enter 0.85s both var(--motion);
 }
 .hero h1 {
   animation-delay: 0.1s;
@@ -529,7 +529,7 @@ select:focus-visible {
   animation-delay: 0.4s;
 }
 .hero-visual {
-  animation: visual-enter 1s 0.2s both;
+  animation: visual-enter 1s 0.2s both var(--motion);
 }
 @keyframes enter {
   from {
@@ -558,7 +558,7 @@ select:focus-visible {
 }
 .model-card {
   min-width: 0;
-  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1);
+  transition: transform 0.4s var(--motion);
 }
 .model-card:hover {
   transform: none;
@@ -579,7 +579,7 @@ select:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1);
+  transition: transform 0.4s var(--motion);
 }
 .model-card:hover .model-image img {
   transform: none;
@@ -618,7 +618,7 @@ select:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s;
+  transition: background 0.3s var(--motion);
 }
 .favourite:hover {
   background: white;
@@ -626,14 +626,14 @@ select:focus-visible {
 .favourite svg {
   width: 16px;
   height: 16px;
-  transition: fill 0.25s;
+  transition: fill 0.25s var(--motion);
   fill: transparent;
 }
 .favourite.is-saved svg {
   fill: var(--ink);
 }
 .heart-pop svg {
-  animation: heart-pop 0.3s ease;
+  animation: heart-pop 0.3s var(--motion);
 }
 @keyframes heart-pop {
   50% {
@@ -745,7 +745,7 @@ select:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s;
+  transition: transform 0.4s var(--motion);
 }
 .build-card:hover img {
   transform: none;
@@ -770,7 +770,7 @@ select:focus-visible {
   color: white;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
   transform: translateY(6px);
-  transition: transform 0.4s;
+  transition: transform 0.4s var(--motion);
 }
 .build-card:hover .build-overlay {
   transform: translateY(0);
@@ -819,7 +819,7 @@ select:focus-visible {
   gap: 28px;
   padding: 25px 0;
   border-bottom: 1px solid var(--line);
-  transition: opacity 0.25s;
+  transition: opacity 0.25s var(--motion);
 }
 .release-row:hover {
   opacity: 0.65;
@@ -993,8 +993,8 @@ footer {
   background: #f3f3f4;
   font-size: 12px;
   transition:
-    background 0.3s,
-    color 0.3s;
+    background 0.3s var(--motion),
+    color 0.3s var(--motion);
 }
 .pill:hover {
   background: #e8e8eb;
@@ -1045,8 +1045,8 @@ footer {
 }
 .filter-grid {
   transition:
-    opacity 0.18s,
-    transform 0.25s;
+    opacity 0.18s var(--motion),
+    transform 0.25s var(--motion);
   row-gap: 48px;
   min-height: 280px;
 }
@@ -1282,7 +1282,7 @@ footer {
   flex-direction: column;
   gap: 10px;
   background: #fafafa;
-  transition: background 0.3s;
+  transition: background 0.3s var(--motion);
   margin-bottom: 32px;
 }
 .upload-zone:hover {
@@ -1414,7 +1414,7 @@ footer {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  animation: visual-enter 0.4s both;
+  animation: visual-enter 0.4s both var(--motion);
 }
 .live-preview > img[hidden] {
   display: none;
@@ -1560,8 +1560,8 @@ footer {
   opacity: 0;
   pointer-events: none;
   transition:
-    opacity 0.25s,
-    transform 0.25s;
+    opacity 0.25s var(--motion),
+    transform 0.25s var(--motion);
   z-index: 100;
   max-width: calc(100% - 32px);
   width: max-content;
@@ -1633,12 +1633,55 @@ dialog > img {
   opacity: 0;
   transform: translateY(25px);
   transition:
-    opacity 0.7s var(--delay, 0ms),
-    transform 0.7s var(--delay, 0ms);
+    opacity 0.7s var(--motion) var(--delay, 0ms),
+    transform 0.7s var(--motion) var(--delay, 0ms);
 }
 .reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+@keyframes content-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+#main > .page-heading,
+#main > .breadcrumb,
+#main > .detail-top {
+  animation: content-rise 0.58s var(--motion) both;
+}
+#main > .detail-top {
+  animation-delay: 90ms;
+}
+.bento-intro.is-visible h2,
+.bento-intro.is-visible .intro-caption,
+.photo-tile.is-visible .photo-tile-copy > *,
+.bento-directory.is-visible h2,
+.bento-directory.is-visible a,
+.section-heading.is-visible h2,
+.section-heading.is-visible .section-subtitle {
+  animation: content-rise 0.62s var(--motion) both;
+}
+.bento-intro.is-visible .intro-caption,
+.section-heading.is-visible .section-subtitle {
+  animation-delay: 120ms;
+}
+.photo-tile.is-visible .photo-tile-copy > :nth-child(2),
+.bento-directory.is-visible a:nth-of-type(1) {
+  animation-delay: 90ms;
+}
+.photo-tile.is-visible .photo-tile-copy > :nth-child(3),
+.bento-directory.is-visible a:nth-of-type(2) {
+  animation-delay: 160ms;
+}
+.photo-tile.is-visible .photo-tile-copy > :nth-child(4),
+.bento-directory.is-visible a:nth-of-type(3) {
+  animation-delay: 220ms;
 }
 @media (min-width: 1600px) {
   .hero-inner {
@@ -2386,10 +2429,17 @@ dialog > img {
   border: 1px solid transparent;
   border-radius: 8px;
   pointer-events: none;
-  transition: border-color 0.25s;
+  transition: border-color 0.35s var(--motion);
 }
 .bento-tile:hover::after {
   border-color: #959599;
+}
+.bento-tile .photo-stage {
+  transition: background-color 0.4s var(--motion);
+}
+.bento-tile:hover .photo-stage,
+.bento-tile:focus-visible .photo-stage {
+  background-color: #202023;
 }
 .tile-topline {
   position: absolute;

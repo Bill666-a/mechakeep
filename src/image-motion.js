@@ -1,5 +1,5 @@
 // One image lifecycle for routes, filters, dialogs and uploaded previews.
-const preference = matchMedia("(prefers-reduced-motion: reduce)");
+import { reducedMotion as preference, motionEase } from "./motion.js";
 const states = new WeakMap();
 const replacements = new WeakMap();
 
@@ -36,7 +36,7 @@ const viewport = new IntersectionObserver(
             {
               duration: 950,
               delay,
-              easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+              easing: motionEase(),
               fill: "backwards",
             },
           );
@@ -126,7 +126,7 @@ export async function replaceImage(image, src, alt) {
     if (state) finish(image, state);
     const fade = image.animate([{ opacity: 1 }, { opacity: 0 }], {
       duration: 160,
-      easing: "ease-out",
+      easing: motionEase(),
       fill: "forwards",
     });
     if (state) state.animation = fade;

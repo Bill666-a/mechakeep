@@ -1,5 +1,7 @@
 import { models, sampleBuilds, releases } from "./data.js";
 import { replaceImage } from "./image-motion.js";
+import { reducedMotion, revealContent } from "./motion.js";
+import { showDialog, dismissDialog } from "./dialogs.js";
 
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => [...root.querySelectorAll(s)];
@@ -56,12 +58,10 @@ let userBuilds = load(
         /^data:image\/(jpeg|png|webp);base64,/.test(b.image),
     ),
 );
-let observer,
-  toastTimer,
+let toastTimer,
   filterTimer,
   routeVersion = 0,
   previewImage = "";
-const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 const link = (text, href, cls = "text-link") =>
   `<a class="${cls}" href="#/${href}">${text}${arrow}</a>`;
 const modelImage = (m, cls = "", eager = false) =>
@@ -78,10 +78,10 @@ function toast(message) {
 function header(route) {
   $("#header").innerHTML =
     `<div class="nav-shell"><a class="brand" href="#/" aria-label="MechaKeep home"><img src="assets/mark.svg" width="29" height="29" alt=""/>MechaKeep<span class="brand-dot">.</span></a><nav aria-label="Main navigation" id="navigation">${[
-      ["", "首页"],
-      ["models", "模型图鉴"],
-      ["builds", "藏家摄影"],
-      ["releases", "发售日历"],
+      ["", "Home"],
+      ["models", "Model Library"],
+      ["builds", "Photography"],
+      ["releases", "Releases"],
     ]
       .map(
         ([p, t]) =>
@@ -89,47 +89,65 @@ function header(route) {
       )
       .join(
         "",
-      )}</nav><div class="nav-actions"><a class="collection-link" href="#/favourites" aria-label="我的收藏，${favourites.length} 件">${icon("heart", 18)}<span>我的收藏</span><span class="collection-count">${favourites.length}</span></a><a class="button button-small nav-submit" href="#/submit">上传作品 ${icon("plus", 15)}</a><button class="menu-toggle" aria-expanded="false" aria-controls="navigation" aria-label="Open navigation">${icon("menu")}</button></div></div>`;
+      )}</nav><div class="nav-actions"><a class="nav-search" data-library-control="search" href="#/models?focus=search" aria-label="Search models" title="Search models">${icon("search", 17)}</a><a class="nav-search" data-library-control="filters" href="#/models?focus=filters" aria-label="Filter models" title="Filter models"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 7h10m4 0h4M3 17h4m4 0h10"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></a><a class="collection-link" href="#/favourites" aria-label="My collection, ${favourites.length} favourites">${icon("heart", 18)}<span>My Collection</span><span class="collection-count">${favourites.length}</span></a><a class="button button-small nav-submit" href="#/submit">Share a build ${icon("plus", 15)}</a><button class="menu-toggle" aria-expanded="false" aria-controls="navigation" aria-label="Open navigation">${icon("menu")}</button></div></div>`;
 }
 function footer() {
   $("#footer").innerHTML =
-    `<div class="container footer-top"><div><a class="brand" href="#/">MechaKeep<span class="brand-dot">.</span></a><p>Hot Toys、环太平洋与高达模型图鉴。</p></div><div class="footer-links"><span class="eyebrow">网站导航</span><a href="#/models">模型图鉴</a><a href="#/builds">藏家摄影</a><a href="#/releases">发售日历</a></div><div class="footer-info"><span class="eyebrow">关于本站</span><p>浏览模型资料，保存喜欢的收藏。<br>摄影作品保留原始署名。</p><a href="#/about">查看网站说明 ${icon("arrow", 14)}</a></div></div><div class="container footer-bottom"><span>© 2026 MechaKeep</span><span>模型信息仅供参考</span></div>`;
+    `<div class="container footer-top"><div><a class="brand" href="#/">MechaKeep<span class="brand-dot">.</span></a><p>Hot Toys, Pacific Rim and Gundam collectibles.</p></div><div class="footer-links"><span class="eyebrow">Explore</span><a href="#/models">Model Library</a><a href="#/builds">Photography</a><a href="#/releases">Releases</a></div><div class="footer-info"><span class="eyebrow">About</span><p>Explore the details. Save your favourites.<br>Original photography credits preserved.</p><a href="#/about">About MechaKeep ${icon("arrow", 14)}</a></div></div><div class="container footer-bottom"><span>© 2026 MechaKeep</span><span>Model information for reference only</span></div>`;
 }
 function modelCard(m, i = 0) {
-  return `<article class="model-card reveal" style="--delay:${(i % 3) * 70}ms"><div class="model-image ${m.transparent ? "cutout" : ""} ${m.userPhoto ? "photo-model" : ""}"><a href="#/model/${m.id}" aria-label="View ${esc(m.name)}">${modelImage(m)}</a><span class="image-grade">${m.label === "Master Grade EX" ? "MGEX" : m.grade} <span>${m.scale}</span></span>${heart(m.id)}</div><div class="model-info"><p class="model-code">${m.code}</p><a href="#/model/${m.id}"><h3>${m.name}</h3></a>${m.cnName ? `<p class="model-chinese">${esc(m.cnName)}</p>` : ""}<p>${m.label} <span>·</span> ${m.scale}</p><div class="model-bottom"><span>${money(m.price)}</span>${link("View model", "model/" + m.id)}</div></div></article>`;
+  return `<article class="model-card reveal" style="--delay:${(i % 3) * 70}ms"><div class="model-image ${m.transparent ? "cutout" : ""} ${m.userPhoto ? "photo-model" : ""}"><a href="#/model/${m.id}" aria-label="View ${esc(m.name)}">${modelImage(m)}</a><span class="image-grade">${m.label === "Master Grade EX" ? "MGEX" : m.grade} <span>${m.scale}</span></span>${heart(m.id)}</div><div class="model-info"><p class="model-code">${m.code}</p><a href="#/model/${m.id}"><h3>${m.name}</h3></a><p>${m.label} <span>·</span> ${m.scale}</p><button type="button" class="flagship-text-link card-spec-trigger" data-open-spec="${m.id}">Gallery & specifications ${arrow}</button><div class="model-bottom"><span>${money(m.price)}</span>${link("View model", "model/" + m.id)}</div></div></article>`;
 }
 function buildCard(b, i = 0) {
   return `<button class="build-card ${b.sample ? "reference-photo-card" : ""} reveal build-${i % 3}" data-build="${esc(b.id)}" style="--delay:${i * 60}ms"><img src="${esc(b.image)}" alt="${esc(b.title)}" width="800" height="900" loading="lazy"/><span class="build-label">${b.sample ? "PHOTO COLLECTION" : "YOUR BUILD"}</span><span class="build-overlay"><span class="build-title">${esc(b.title)}</span><span class="build-author">${esc(b.builder)} <span>↗</span></span></span></button>`;
 }
 function photoTile(id, slot, eager = false) {
   const m = models.find((m) => m.id === id);
-  return `<a class="bento-tile photo-tile ${slot}" href="#/model/${m.id}"><div class="photo-stage">${modelImage(m, "", eager)}</div><div class="photo-tile-copy"><span class="eyebrow">HOT TOYS · ${m.scale}</span><h2>${esc(m.cnName || m.name)}</h2><span>${esc(m.name)}</span><span class="photo-tile-credit">摄影 · ${esc(m.credit)}</span></div></a>`;
+  const order =
+    {
+      "bento-iron": 0,
+      "bento-cap": 1,
+      "bento-spider": 2,
+      "bento-thor": 3,
+      "photo-wide": 0,
+      "photo-tall": 1,
+      "photo-medium": 2,
+    }[slot] || 0;
+  return `<article class="bento-tile photo-tile reveal ${slot}" style="--delay:${order * 95}ms">
+    <a class="photo-stage" href="#/model/${m.id}" aria-label="View ${esc(m.name)}">${modelImage(m, "", eager)}</a>
+    <div class="photo-tile-copy"><span class="eyebrow">HOT TOYS · ${m.scale}</span>
+      <a href="#/model/${m.id}"><h2>${esc(m.name)}</h2></a>
+      <span>${esc(m.series)}</span><span class="photo-tile-credit">Photography · ${esc(m.credit)}</span>
+      <button type="button" class="flagship-text-link" data-open-spec="${m.id}">Gallery & specifications ${arrow}</button>
+    </div></article>`;
 }
 function home() {
   const item = (id) => models.find((m) => m.id === id);
-  return `<section class="bento-home container"><div class="bento-grid">
- <div class="bento-intro"><h1>Hot Toys 与机甲模型</h1><p class="intro-caption">从钢铁侠、美国队长到高达与环太平洋，找到你喜欢的收藏。</p></div>
+  return `<section class="flagship-hero" aria-labelledby="flagship-title"><div class="flagship-hero-inner container"><div class="flagship-copy reveal"><span class="flagship-label">HOT TOYS · MOVIE MASTERPIECE</span><h1 id="flagship-title">Iron Man.<br>The final armour.</h1><p>Mark LXXXV. Every contour, cast in red and gold.</p><div class="flagship-actions"><a class="button flagship-button" href="#/model/iron-man">Explore the model</a><button class="flagship-text-link" type="button" data-open-spec="iron-man">View technical specifications ${arrow}</button></div></div><div class="flagship-visual reveal" style="--delay:120ms">${modelImage(item("iron-man"), "flagship-image", true)}<span>Photography · ${esc(item("iron-man").credit)}</span></div></div></section>
+  <section class="industrial-features container" aria-labelledby="feature-title"><div class="section-heading reveal"><div><p class="eyebrow">ENGINEERED TO BE SEEN</p><h2 id="feature-title">From frame to finish.</h2></div><p class="feature-heading-note">Precision in every detail.</p></div><div class="industrial-grid"><article class="industrial-panel frame-panel reveal"><div class="industrial-panel-copy"><span class="eyebrow">MGEX · INNER FRAME</span><h3>Engineered<br>from within.</h3><p>Explore the inner frame and complete armour.</p></div><img id="frame-photo" src="assets/frame.webp" alt="Strike Freedom Gundam gold inner frame" width="1200" height="900" loading="lazy"/><div class="frame-controls" role="group" aria-label="View frame or armour"><button type="button" data-frame-view="frame" aria-pressed="true">Inner frame</button><button type="button" data-frame-view="freedom" aria-pressed="false">Full armour</button></div><a class="frame-detail-link" href="#/model/strike-freedom">Model details ${arrow}</a></article><a class="industrial-panel macro-panel reveal" style="--delay:90ms" href="#/model/iron-man-mk42"><div class="industrial-panel-copy"><span class="eyebrow">HOT TOYS · MARK XLII</span><h3>A closer look.<br>A finer finish.</h3><p>The metallic finish and layered armour of Mark XLII.</p></div><img src="assets/iron-man-mk42-action.webp" alt="Hot Toys Iron Man Mark XLII armour finish close-up" width="800" height="800" loading="lazy"/></a><div class="industrial-panel spec-panel reveal" style="--delay:160ms"><span class="eyebrow">MARK LXXXV / MMS528D30</span><h3>Small scale.<br>Remarkable detail.</h3><div class="industrial-stats"><div><strong>1/6</strong><span>Scale</span></div><div><strong>32.5 <small>cm</small></strong><span>Approx. height</span></div></div><button type="button" class="flagship-text-link" data-open-spec="iron-man">View all specifications ${arrow}</button></div></div></section>
+  <section class="bento-home container" aria-label="Model collection"><div class="bento-grid">
+ <div class="bento-intro reveal"><h2>Made to be seen.</h2><p class="intro-caption">Discover Hot Toys, Pacific Rim and Gundam.</p></div>
  ${photoTile("iron-man", "bento-iron", true)}
  ${photoTile("captain-america-stealth", "bento-cap", true)}
  ${photoTile("spider-man-brand-new-day", "bento-spider", true)}
  ${photoTile("moon-knight", "bento-thor", true)}
- <div class="bento-directory"><h2>按系列浏览</h2><a href="#/models?category=Hot%20Toys">Hot Toys <span>${models
+ <div class="bento-directory reveal" style="--delay:90ms"><h2>Browse collections</h2><a href="#/models?category=Hot%20Toys">Hot Toys <span>${models
    .filter((m) => m.category === "Hot Toys")
    .length.toString()
    .padStart(
      2,
      "0",
    )} →</span></a><a href="#/models?category=Pacific%20Rim">Pacific Rim <span>01 →</span></a><a href="#/models?category=Gundam">Gundam <span>06 →</span></a></div>
- </div><div class="bento-footline"><span>Hot Toys · 环太平洋 · 高达</span><a href="#/models">查看全部 ${models.length} 件模型 →</a></div></section>
- <section class="container photography-section" id="featured"><div class="section-heading reveal"><div><h2>藏家实拍</h2><p class="section-subtitle">看看角色与战甲在镜头下的细节。</p></div>${link("查看全部照片", "builds")}</div><div class="photo-feature-grid">${photoTile("scarlet-witch", "photo-wide")}${photoTile("iron-spider-2", "photo-tall")}${photoTile("iron-man-mk42", "photo-medium")}</div><p class="quiet-note">照片由藏家提供，保留原始水印与摄影署名。</p></section>
- <section class="container machine-section"><div class="section-heading reveal"><div><h2>更多机甲收藏</h2><p class="section-subtitle">环太平洋的机甲与高达模型。</p></div>${link("浏览模型图鉴", "models")}</div><div class="machine-grid"><a class="machine-feature reveal" href="#/model/gipsy-danger"><div><span class="eyebrow">BANDAI / SOUL OF CHOGOKIN</span><h3>危险流浪者</h3><p>GX-77 Gipsy Danger</p><span>环太平洋 · 约 23 厘米合金可动模型</span></div>${modelImage(item("gipsy-danger"))}<span class="machine-link">查看模型 →</span></a><a class="gundam-feature reveal" href="#/model/strike-freedom"><span class="eyebrow">BANDAI / MGEX</span>${modelImage(item("strike-freedom"))}<div><h3>强袭自由高达</h3><span>MGEX · 1/100 比例</span></div></a></div></section>
- <section class="container collector-notes reveal"><div><h2>喜欢的模型，<br>收进自己的清单。</h2></div><div><p>看到心仪的模型，点按收藏即可保存。收藏清单保存在当前浏览器中。</p>${link("查看我的收藏", "favourites")}</div></section>
- <section class="container release-preview reveal"><div><h2>发售日历</h2><p>按月份浏览模型信息与参考日期。</p>${link("查看日历", "releases")}</div><div class="release-preview-list">${releases
+ </div><div class="bento-footline reveal"><span>Hot Toys · Pacific Rim · Gundam</span><a href="#/models">Explore all ${models.length} models →</a></div></section>
+ <section class="container photography-section" id="featured"><div class="section-heading reveal"><div><h2>Collector photography.</h2><p class="section-subtitle">Iconic characters. Seen through a collector’s lens.</p></div>${link("View all photographs", "builds")}</div><div class="photo-feature-grid">${photoTile("scarlet-witch", "photo-wide")}${photoTile("iron-spider-2", "photo-tall")}${photoTile("iron-man-mk42", "photo-medium")}</div><p class="quiet-note">Collector-supplied photographs. Original watermarks and credits preserved.</p></section>
+ <section class="container machine-section"><div class="section-heading reveal"><div><h2>More mechanical marvels.</h2><p class="section-subtitle">Pacific Rim Jaegers and Gundam model kits.</p></div>${link("Explore the model library", "models")}</div><div class="machine-grid"><a class="machine-feature reveal" href="#/model/gipsy-danger"><div><span class="eyebrow">BANDAI / SOUL OF CHOGOKIN</span><h3>Gipsy Danger</h3><p>GX-77 Gipsy Danger</p><span>Pacific Rim · Approx. 23 cm diecast figure</span></div>${modelImage(item("gipsy-danger"))}<span class="machine-link">View model →</span></a><a class="gundam-feature reveal" style="--delay:110ms" href="#/model/strike-freedom"><span class="eyebrow">BANDAI / MGEX</span>${modelImage(item("strike-freedom"))}<div><h3>Strike Freedom Gundam</h3><span>MGEX · 1/100 scale</span></div></a></div></section>
+ <section class="container collector-notes reveal"><div><h2>Your favourites.<br>All in one place.</h2></div><div><p>See something you like? Save it to your collection, stored in this browser.</p>${link("View my collection", "favourites")}</div></section>
+ <section class="container release-preview reveal"><div><h2>Releases</h2><p>Browse models and reference dates by month.</p>${link("View calendar", "releases")}</div><div class="release-preview-list">${releases
    .slice(1, 3)
    .map((r) => releaseRow(r, true))
    .join(
      "",
-   )}<span class="quiet-note">展示用日历 · 日期仅供示意</span></div></section>`;
+   )}<span class="quiet-note">Demo calendar · Illustrative dates only</span></div></section>`;
 }
 function pageHeading(eyebrow, title, description, action = "") {
   return `<div class="page-heading container"><div><p class="eyebrow">${eyebrow}</p><h1>${title}</h1><p>${description}</p></div>${action}</div>`;
@@ -149,7 +167,7 @@ function productReferences(m) {
 function detail(id) {
   const m = models.find((m) => m.id === id);
   if (!m) return notFound();
-  return `<div class="container breadcrumb"><a href="#/models">Model Library</a><span>/</span><span>${m.name}</span></div><section class="container detail-top">${productGallery(m)}<div class="detail-copy"><p class="eyebrow">${m.code} · ${m.manufacturer}</p><h1>${m.name}</h1>${m.cnName ? `<p class="detail-chinese">${esc(m.cnName)}</p>` : ""}<p class="detail-series">${m.series}</p>${m.character ? `<p class="character-line">${esc(m.character)}</p>` : ""}<div class="detail-tags"><span>${m.label}</span><span>${m.scale}${m.scale.includes("/") ? " scale" : " tall"}</span>${m.height ? `<span>Approx. ${m.height}</span>` : ""}</div>${m.price != null ? `<div class="detail-price">${money(m.price)}<span>Illustrative reference price</span></div>` : '<p class="price-unverified">Reference price not verified</p>'}<div class="release-meta"><span>${m.date ? "Original release" : "Product reference"}<strong>${m.date ? dateText(m.date) : m.code}</strong></span><span class="badge available">${m.date ? "Released" : "Catalogue item"}</span></div>${m.editionNote ? '<p class="edition-indicator">Edition details noted in the product references below.</p>' : ""}${heart(m.id, true)}<p class="detail-save-note">A little inspiration, saved for later.</p>${productReferences(m)}</div></section><section class="container detail-about reveal"><p class="eyebrow">ABOUT THIS COLLECTIBLE</p><h2>${m.note}</h2><p>${m.description}</p></section><section class="container detail-editorial reveal"><div class="editorial-image ${m.userPhoto ? "photo-editorial" : ""}">${m.id === "strike-freedom" ? '<img src="assets/frame.webp" alt="Strike Freedom gold inner frame" width="1200" height="900" loading="lazy"/>' : modelImage({ ...m, image: m.gallery?.[1] || m.image })}</div><div><p class="eyebrow">LOOK A LITTLE CLOSER</p><h2>Every piece.<br>Part of the story.</h2><p>${m.detail}</p>${m.credit ? `<p class="photo-credit">Photography · ${esc(m.credit)}</p>` : ""}${link("Show us your build", "submit?model=" + m.id)}</div></section><section class="section container"><div class="section-heading reveal"><div><p class="eyebrow">KEEP EXPLORING</p><h2>The next possibility.</h2></div>${link("All models", "models")}</div><div class="model-grid">${models
+  return `<div class="container breadcrumb"><a href="#/models">Model Library</a><span>/</span><span>${m.name}</span></div><section class="container detail-top">${productGallery(m)}<div class="detail-copy"><p class="eyebrow">${m.code} · ${m.manufacturer}</p><h1>${m.name}</h1><p class="detail-series">${m.series}</p>${m.character ? `<p class="character-line">${esc(m.character)}</p>` : ""}<div class="detail-tags"><span>${m.label}</span><span>${m.scale}${m.scale.includes("/") ? " scale" : " tall"}</span>${m.height ? `<span>Approx. ${m.height}</span>` : ""}</div>${m.price != null ? `<div class="detail-price">${money(m.price)}<span>Illustrative reference price</span></div>` : '<p class="price-unverified">Reference price not verified</p>'}<div class="release-meta"><span>${m.date ? "Original release" : "Product reference"}<strong>${m.date ? dateText(m.date) : m.code}</strong></span><span class="badge available">${m.date ? "Released" : "Catalogue item"}</span></div>${m.editionNote ? '<p class="edition-indicator">Edition details noted in the product references below.</p>' : ""}${heart(m.id, true)}<button type="button" class="flagship-text-link detail-spec-trigger" data-open-spec="${m.id}">Gallery & technical specifications ${arrow}</button><p class="detail-save-note">A little inspiration, saved for later.</p>${productReferences(m)}</div></section><section class="container detail-about reveal"><p class="eyebrow">ABOUT THIS COLLECTIBLE</p><h2>${m.note}</h2><p>${m.description}</p></section><section class="container detail-editorial reveal"><div class="editorial-image ${m.userPhoto ? "photo-editorial" : ""}">${m.id === "strike-freedom" ? '<img src="assets/frame.webp" alt="Strike Freedom gold inner frame" width="1200" height="900" loading="lazy"/>' : modelImage({ ...m, image: m.gallery?.[1] || m.image })}</div><div><p class="eyebrow">LOOK A LITTLE CLOSER</p><h2>Every piece.<br>Part of the story.</h2><p>${m.detail}</p>${m.credit ? `<p class="photo-credit">Photography · ${esc(m.credit)}</p>` : ""}${link("Show us your build", "submit?model=" + m.id)}</div></section><section class="section container"><div class="section-heading reveal"><div><p class="eyebrow">KEEP EXPLORING</p><h2>The next possibility.</h2></div>${link("All models", "models")}</div><div class="model-grid">${models
     .filter((n) => n.id !== m.id)
     .slice(0, 2)
     .map(modelCard)
@@ -227,18 +245,7 @@ function renderModels(animate = true) {
   else update();
 }
 function reveal() {
-  observer?.disconnect();
-  observer = new IntersectionObserver(
-    (entries) =>
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
-      }),
-    { threshold: 0.08 },
-  );
-  $$(".reveal:not(.is-visible)").forEach((el) => observer.observe(el));
+  revealContent();
 }
 function route() {
   if (location.hash === "#main" || location.hash === "#featured") return;
@@ -247,6 +254,7 @@ function route() {
   const [path, query = ""] = (location.hash.slice(2) || "").split("?");
   const [page, id] = path.split("/");
   $("#build-dialog").close();
+  $("#spec-dialog").close();
   document.body.classList.remove("menu-open");
   header(page === "model" ? "models" : page);
   footer();
@@ -264,7 +272,7 @@ function route() {
     about,
   };
   $("#main").innerHTML = (renderers[page] || notFound)();
-  document.title = `${{ "": "Hot Toys 与机甲模型", models: "模型图鉴", favourites: "我的收藏", model: models.find((m) => m.id === id)?.name || "未找到模型", builds: "藏家摄影", submit: "上传作品", releases: "发售日历", about: "关于本站" }[page] || "未找到页面"} — MechaKeep`;
+  document.title = `${{ "": "Hot Toys & Mecha Collectibles", models: "Model Library", favourites: "My Collection", model: models.find((m) => m.id === id)?.name || "Model not found", builds: "Photography", submit: "Share a build", releases: "Releases", about: "About" }[page] || "Page not found"} — MechaKeep`;
   window.scrollTo({ top: 0, behavior: "instant" });
   if (page === "models" || page === "favourites") {
     const category = new URLSearchParams(query).get("category");
@@ -281,6 +289,11 @@ function route() {
   if (page === "submit") setupForm();
   reveal();
   $("#main").focus({ preventScroll: true });
+  if (page === "models") {
+    const focus = new URLSearchParams(query).get("focus");
+    if (focus === "search") $("#model-search")?.focus();
+    if (focus === "filters") $("[data-grade].active")?.focus();
+  }
 }
 function toggleFavourite(id) {
   const next = favourites.includes(id)
@@ -323,7 +336,15 @@ function openBuild(id) {
   const m = models.find((m) => m.id === b.model);
   const dialog = $("#build-dialog");
   dialog.innerHTML = `<button class="dialog-close" aria-label="Close build">${icon("close")}</button><img src="${esc(b.image)}" alt="${esc(b.title)}"/><div class="dialog-copy"><p class="eyebrow">${b.sample ? "PHOTO COLLECTION" : "YOUR WORKBENCH"}</p><h2 id="dialog-title">${esc(b.title)}</h2><p>By ${esc(b.builder)} · ${esc(m.name)}</p><p class="build-description">${esc(b.description)}</p>${link("Explore this collectible", "model/" + b.model)}${!b.sample ? `<button class="delete-build" data-delete="${esc(b.id)}">Delete this build</button>` : ""}</div>`;
-  dialog.showModal();
+  showDialog(dialog);
+}
+function openSpec(id) {
+  const m = models.find((item) => item.id === id);
+  if (!m) return;
+  const images = m.gallery?.length ? m.gallery : [m.image];
+  const dialog = $("#spec-dialog");
+  dialog.innerHTML = `<button type="button" class="dialog-close" data-close-spec aria-label="Close specifications">${icon("close")}</button><div class="spec-dialog-layout"><div class="spec-dialog-gallery"><img id="spec-main-photo" src="assets/${images[0]}.webp" alt="${esc(m.name)} · View 1" width="800" height="900"/><p class="spec-photo-credit">${m.credit ? `Photography · ${esc(m.credit)}` : esc(m.manufacturer)}<span id="spec-photo-count" aria-live="polite">1 / ${images.length}</span></p><div class="spec-thumbnails" role="group" aria-label="Change model view">${images.map((src, index) => `<button type="button" data-spec-photo="${index}" aria-pressed="${index === 0}" aria-label="View ${index + 1}"><img src="assets/${src}.webp" alt="" width="72" height="72" loading="lazy"/></button>`).join("")}</div></div><div class="spec-dialog-copy"><p class="eyebrow">${esc(m.manufacturer)} / ${esc(m.code)}</p><h2 id="spec-dialog-title">${esc(m.name)}</h2><p>${esc(m.series)}</p><dl class="spec-list"><div><dt>Product code</dt><dd>${esc(m.code)}</dd></div><div><dt>${m.scale.includes("/") ? "Scale" : "Height"}</dt><dd>${esc(m.scale)}</dd></div>${m.height ? `<div><dt>Approx. height</dt><dd>${esc(m.height)}</dd></div>` : ""}<div><dt>Series</dt><dd>${esc(m.label)}</dd></div><div><dt>Manufacturer</dt><dd>${esc(m.manufacturer)}</dd></div></dl><p class="spec-note">${esc(m.detail)}</p>${productReferences(m)}<a class="button flagship-button" href="#/model/${m.id}">Explore this model</a></div></div>`;
+  showDialog(dialog);
 }
 let uploadVersion = 0;
 function setupForm() {
@@ -430,6 +451,63 @@ function setupForm() {
   });
 }
 document.addEventListener("click", async (e) => {
+  const dialogLink = e.target.closest('dialog a[href^="#/"]');
+  if (dialogLink && location.hash === dialogLink.getAttribute("href")) {
+    dismissDialog(dialogLink.closest("dialog"));
+  }
+  const libraryControl = e.target.closest("[data-library-control]");
+  if (libraryControl && location.hash === libraryControl.getAttribute("href")) {
+    e.preventDefault();
+    const selector =
+      libraryControl.dataset.libraryControl === "search"
+        ? "#model-search"
+        : "[data-grade].active";
+    $(selector)?.focus();
+    return;
+  }
+  const frameView = e.target.closest("[data-frame-view]");
+  if (frameView) {
+    const changed = await replaceImage(
+      $("#frame-photo"),
+      `assets/${frameView.dataset.frameView}.webp`,
+      frameView.dataset.frameView === "frame"
+        ? "Strike Freedom Gundam gold inner frame"
+        : "Strike Freedom Gundam complete armour",
+    );
+    if (changed)
+      $$("[data-frame-view]").forEach((button) =>
+        button.setAttribute("aria-pressed", String(button === frameView)),
+      );
+    return;
+  }
+  const specTrigger = e.target.closest("[data-open-spec]");
+  if (specTrigger) {
+    openSpec(specTrigger.dataset.openSpec);
+    return;
+  }
+  if (e.target.closest("[data-close-spec]")) {
+    dismissDialog($("#spec-dialog"));
+    return;
+  }
+  const specPhoto = e.target.closest("[data-spec-photo]");
+  if (specPhoto) {
+    const image = $("#spec-main-photo");
+    const src = $("img", specPhoto).getAttribute("src");
+    const changed = await replaceImage(
+      image,
+      src,
+      `${$("#spec-dialog-title").textContent} · View ${Number(specPhoto.dataset.specPhoto) + 1}`,
+    );
+    if (changed && specPhoto.isConnected && $("#spec-dialog").open) {
+      const buttons = $$("[data-spec-photo]");
+      buttons.forEach((button) =>
+        button.setAttribute("aria-pressed", String(button === specPhoto)),
+      );
+      $("#spec-photo-count").textContent =
+        `${Number(specPhoto.dataset.specPhoto) + 1} / ${buttons.length}`;
+    }
+    return;
+  }
   const photo = e.target.closest("[data-photo]");
   if (photo) {
     const m = models.find((m) => m.id === photo.dataset.photoModel);
@@ -483,7 +561,8 @@ document.addEventListener("click", async (e) => {
   }
   const build = e.target.closest("[data-build]");
   if (build) openBuild(build.dataset.build);
-  if (e.target.closest(".dialog-close")) $("#build-dialog").close();
+  if (e.target.closest(".dialog-close"))
+    dismissDialog(e.target.closest("dialog"));
   const del = e.target.closest("[data-delete]");
   if (del) {
     if (del.dataset.confirm !== "true") {
@@ -533,18 +612,6 @@ document.addEventListener("keydown", (e) => {
     $(".menu-toggle").focus();
   }
 });
-$("#build-dialog").addEventListener("click", (e) => {
-  if (e.target === $("#build-dialog")) {
-    const box = e.target.getBoundingClientRect();
-    if (
-      e.clientX < box.left ||
-      e.clientX > box.right ||
-      e.clientY < box.top ||
-      e.clientY > box.bottom
-    )
-      e.target.close();
-  }
-});
 let scrollQueued = false;
 window.addEventListener(
   "scroll",
@@ -553,9 +620,6 @@ window.addEventListener(
     scrollQueued = true;
     requestAnimationFrame(() => {
       $("#header").classList.toggle("scrolled", scrollY > 24);
-      const visual = $(".hero-model");
-      if (visual && !reducedMotion.matches)
-        visual.style.transform = `translateY(${Math.min(scrollY * 0.025, 18)}px) scale(${1 + Math.min(scrollY * 0.000035, 0.025)})`;
       scrollQueued = false;
     });
   },
