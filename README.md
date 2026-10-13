@@ -79,4 +79,13 @@ The site is a static frontend. Favourites and submitted builds remain in the bro
 
 Use the header search and filter controls to focus the relevant catalogue control. Every model card exposes its specification dialog. Multi-image models show their actual supplied angles; a single-photo model retains one angle instead of inventing additional images. The structure panel switches between the existing MGEX inner-frame and armoured photographs; it is a photo comparison, not a simulated 3D joint rig. Product statistics come from the catalogue metadata, so the design does not invent a joint count.
 
-No new runtime library is required. The development commands and GitHub Pages workflow above remain unchanged. Local edits become public only after they are pushed and the Pages deployment succeeds.
+Animations and interactive controls use native JavaScript; the discovery grid uses locally hosted Bootstrap 5 CSS. The development commands and GitHub Pages workflow above remain unchanged. Local edits become public only after they are pushed and the Pages deployment succeeds.
+
+## Reference-inspired discovery update — October 14, 2026
+
+The supplied Cultural Exploration Platform informs the homepage search, feature-entry cards and curated carousel. MechaKeep retains its English content, dark product photography and native motion system. The reference site's text and images are not copied.
+
+- Bootstrap 5.3.3 grid CSS is served locally under `public/vendor/bootstrap`, with its MIT license. It provides the real responsive `row` / `col-12` / `col-md-6` layout for four discovery entrances. Custom visual styles remain in `src/discovery.css`.
+- Homepage search opens filtered model results via the `q` route parameter, including on refresh. Collection shortcuts use existing category filters.
+- A manual, keyboard-operable featured carousel shows Gipsy Danger, Strike Freedom and Thor. It has labelled previous/next controls and a live position announcement; no autoplay interrupts reading.
+- Native `details` elements explain scales, local favourites, photo submissions and illustrative calendar data. Reduced-motion preferences apply to the new transitions.

@@ -121,9 +121,67 @@ function photoTile(id, slot, eager = false) {
       <button type="button" class="flagship-text-link" data-open-spec="${m.id}">Gallery & specifications ${arrow}</button>
     </div></article>`;
 }
+function discovery() {
+  const paths = [
+    [
+      "01",
+      "Model Library",
+      "Find your next centrepiece.",
+      "Browse verified edition notes, scales and model photography.",
+      "models",
+      "Explore models",
+    ],
+    [
+      "02",
+      "Photography",
+      "A different perspective.",
+      "Explore collector photographs, then add a build of your own.",
+      "builds",
+      "View photography",
+    ],
+    [
+      "03",
+      "My Collection",
+      "Keep what inspires you.",
+      "Save favourites to a personal shortlist in this browser.",
+      "favourites",
+      "Open my collection",
+    ],
+    [
+      "04",
+      "Release Calendar",
+      "Plan the next addition.",
+      "Explore the prototype calendar with clearly marked example dates.",
+      "releases",
+      "View releases",
+    ],
+  ];
+  return `<section class="container discovery-section" aria-labelledby="discovery-title">
+    <div class="discovery-heading reveal"><div><p class="eyebrow">THE COLLECTOR'S DESK</p><h2 id="discovery-title">Where will you start?</h2><p>Discover a model. Study the details. Make it yours.</p></div>
+    <form id="discovery-search" role="search"><label for="home-search">Find a figure or kit</label><div class="discovery-search-field">${icon("search", 18)}<input id="home-search" name="q" type="search" placeholder="Try Iron Man, Gundam or MMS783" maxlength="120"/><button class="button" type="submit">Search</button></div></form></div>
+    <div class="discovery-categories reveal" aria-label="Explore collections">${["Hot Toys", "Pacific Rim", "Gundam"].map((category) => `<a href="#/models?category=${encodeURIComponent(category)}">${category}<span>${models.filter((m) => m.category === category).length} models</span>${arrow}</a>`).join("")}</div>
+    <div class="row g-3 discovery-paths">${paths.map(([number, label, title, description, href, action], i) => `<div class="col-12 col-md-6"><a class="discovery-path reveal" style="--delay:${i * 65}ms" href="#/${href}"><div class="path-label"><span>${label}</span><span>${number}</span></div><h3>${title}</h3><p>${description}</p><span class="path-action">${action}${arrow}</span></a></div>`).join("")}</div>
+  </section>`;
+}
+function spotlight() {
+  const ids = ["gipsy-danger", "strike-freedom", "thor"];
+  return `<section class="container spotlight-section" aria-labelledby="spotlight-title"><div class="section-heading reveal"><div><p class="eyebrow">THE EDITOR'S SELECTION</p><h2 id="spotlight-title">Beyond the armour.</h2><p class="section-subtitle">Three worlds. A closer look at each.</p></div>${link("Explore the model library", "models")}</div>
+    <div class="spotlight-shell reveal" role="region" aria-roledescription="carousel" aria-label="Featured collectibles">
+    ${ids
+      .map((id, i) => {
+        const m = models.find((m) => m.id === id);
+        return `<article class="spotlight-slide" data-spotlight-slide="${i}" role="group" aria-roledescription="slide" aria-label="${i + 1} of ${ids.length}" ${i ? "hidden" : ""}><div class="spotlight-copy"><p class="eyebrow">${esc(m.manufacturer)} / ${esc(m.label)}</p><h3>${esc(m.name)}</h3><p>${esc(m.description)}</p><dl><div><dt>${m.scale.includes("/") ? "Scale" : "Height"}</dt><dd>${esc(m.scale)}</dd></div><div><dt>Product code</dt><dd>${esc(m.code)}</dd></div></dl>${link("Explore this collectible", "model/" + id, "button")}</div><a class="spotlight-image" href="#/model/${id}" aria-label="View ${esc(m.name)}">${modelImage(m)}</a></article>`;
+      })
+      .join("")}
+    <div class="spotlight-controls"><span id="spotlight-count" role="status" aria-live="polite">01 / 03 · Gipsy Danger</span><div><button type="button" data-spotlight-step="-1" aria-label="Previous collectible">${arrow}</button><button type="button" data-spotlight-step="1" aria-label="Next collectible">${arrow}</button></div></div></div></section>`;
+}
+function collectorGuide() {
+  return `<section class="container collector-guide reveal" aria-labelledby="guide-title"><div><p class="eyebrow">BEFORE YOU EXPLORE</p><h2 id="guide-title">A little guidance.</h2><p>The essentials, in one place.</p>${link("About MechaKeep", "about")}</div><div class="guide-questions"><details><summary>How do I save a model?</summary><p>Open the Model Library and select a heart, or choose Add to favourites on a model page. Your selections appear in My Collection and stay in this browser.</p></details><details><summary>What does 1/6 scale mean?</summary><p>A 1/6 scale figure is approximately one sixth of its subject's full size. Model kits use other scales, such as 1/100. Check each model's specifications for its listed size.</p></details><details><summary>Can I share my own photography?</summary><p>Choose Share a build, add a photograph and select its model. Your build is saved locally on this device; it is not published to a public gallery.</p></details><details><summary>Are the prices and release dates live?</summary><p>No. Prices are illustrative references and the calendar uses example restock dates. Unverified prices are marked. Check the product references for edition information.</p></details></div></section>`;
+}
 function home() {
   const item = (id) => models.find((m) => m.id === id);
   return `<section class="flagship-hero" aria-labelledby="flagship-title"><div class="flagship-hero-inner container"><div class="flagship-copy reveal"><span class="flagship-label">HOT TOYS · MOVIE MASTERPIECE</span><h1 id="flagship-title">Iron Man.<br>The final armour.</h1><p>Mark LXXXV. Every contour, cast in red and gold.</p><div class="flagship-actions"><a class="button flagship-button" href="#/model/iron-man">Explore the model</a><button class="flagship-text-link" type="button" data-open-spec="iron-man">View technical specifications ${arrow}</button></div></div><div class="flagship-visual reveal" style="--delay:120ms">${modelImage(item("iron-man"), "flagship-image", true)}<span>Photography · ${esc(item("iron-man").credit)}</span></div></div></section>
+  ${discovery()}
   <section class="industrial-features container" aria-labelledby="feature-title"><div class="section-heading reveal"><div><p class="eyebrow">ENGINEERED TO BE SEEN</p><h2 id="feature-title">From frame to finish.</h2></div><p class="feature-heading-note">Precision in every detail.</p></div><div class="industrial-grid"><article class="industrial-panel frame-panel reveal"><div class="industrial-panel-copy"><span class="eyebrow">MGEX · INNER FRAME</span><h3>Engineered<br>from within.</h3><p>Explore the inner frame and complete armour.</p></div><img id="frame-photo" src="assets/frame.webp" alt="Strike Freedom Gundam gold inner frame" width="1200" height="900" loading="lazy"/><div class="frame-controls" role="group" aria-label="View frame or armour"><button type="button" data-frame-view="frame" aria-pressed="true">Inner frame</button><button type="button" data-frame-view="freedom" aria-pressed="false">Full armour</button></div><a class="frame-detail-link" href="#/model/strike-freedom">Model details ${arrow}</a></article><a class="industrial-panel macro-panel reveal" style="--delay:90ms" href="#/model/iron-man-mk42"><div class="industrial-panel-copy"><span class="eyebrow">HOT TOYS · MARK XLII</span><h3>A closer look.<br>A finer finish.</h3><p>The metallic finish and layered armour of Mark XLII.</p></div><img src="assets/iron-man-mk42-action.webp" alt="Hot Toys Iron Man Mark XLII armour finish close-up" width="800" height="800" loading="lazy"/></a><div class="industrial-panel spec-panel reveal" style="--delay:160ms"><span class="eyebrow">MARK LXXXV / MMS528D30</span><h3>Small scale.<br>Remarkable detail.</h3><div class="industrial-stats"><div><strong>1/6</strong><span>Scale</span></div><div><strong>32.5 <small>cm</small></strong><span>Approx. height</span></div></div><button type="button" class="flagship-text-link" data-open-spec="iron-man">View all specifications ${arrow}</button></div></div></section>
   <section class="bento-home container" aria-label="Model collection"><div class="bento-grid">
  <div class="bento-intro reveal"><h2>Made to be seen.</h2><p class="intro-caption">Discover Hot Toys, Pacific Rim and Gundam.</p></div>
@@ -140,14 +198,14 @@ function home() {
    )} →</span></a><a href="#/models?category=Pacific%20Rim">Pacific Rim <span>01 →</span></a><a href="#/models?category=Gundam">Gundam <span>06 →</span></a></div>
  </div><div class="bento-footline reveal"><span>Hot Toys · Pacific Rim · Gundam</span><a href="#/models">Explore all ${models.length} models →</a></div></section>
  <section class="container photography-section" id="featured"><div class="section-heading reveal"><div><h2>Collector photography.</h2><p class="section-subtitle">Iconic characters. Seen through a collector’s lens.</p></div>${link("View all photographs", "builds")}</div><div class="photo-feature-grid">${photoTile("scarlet-witch", "photo-wide")}${photoTile("iron-spider-2", "photo-tall")}${photoTile("iron-man-mk42", "photo-medium")}</div><p class="quiet-note">Collector-supplied photographs. Original watermarks and credits preserved.</p></section>
- <section class="container machine-section"><div class="section-heading reveal"><div><h2>More mechanical marvels.</h2><p class="section-subtitle">Pacific Rim Jaegers and Gundam model kits.</p></div>${link("Explore the model library", "models")}</div><div class="machine-grid"><a class="machine-feature reveal" href="#/model/gipsy-danger"><div><span class="eyebrow">BANDAI / SOUL OF CHOGOKIN</span><h3>Gipsy Danger</h3><p>GX-77 Gipsy Danger</p><span>Pacific Rim · Approx. 23 cm diecast figure</span></div>${modelImage(item("gipsy-danger"))}<span class="machine-link">View model →</span></a><a class="gundam-feature reveal" style="--delay:110ms" href="#/model/strike-freedom"><span class="eyebrow">BANDAI / MGEX</span>${modelImage(item("strike-freedom"))}<div><h3>Strike Freedom Gundam</h3><span>MGEX · 1/100 scale</span></div></a></div></section>
+ ${spotlight()}
  <section class="container collector-notes reveal"><div><h2>Your favourites.<br>All in one place.</h2></div><div><p>See something you like? Save it to your collection, stored in this browser.</p>${link("View my collection", "favourites")}</div></section>
  <section class="container release-preview reveal"><div><h2>Releases</h2><p>Browse models and reference dates by month.</p>${link("View calendar", "releases")}</div><div class="release-preview-list">${releases
    .slice(1, 3)
    .map((r) => releaseRow(r, true))
    .join(
      "",
-   )}<span class="quiet-note">Demo calendar · Illustrative dates only</span></div></section>`;
+   )}<span class="quiet-note">Demo calendar · Illustrative dates only</span></div></section>${collectorGuide()}`;
 }
 function pageHeading(eyebrow, title, description, action = "") {
   return `<div class="page-heading container"><div><p class="eyebrow">${eyebrow}</p><h1>${title}</h1><p>${description}</p></div>${action}</div>`;
@@ -283,6 +341,7 @@ function route() {
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", String(active));
     });
+    $("#model-search").value = new URLSearchParams(query).get("q") || "";
     renderModels(false);
   }
   if (page === "releases") renderReleases();
@@ -450,7 +509,27 @@ function setupForm() {
     }
   });
 }
+document.addEventListener("submit", (e) => {
+  if (e.target.id !== "discovery-search") return;
+  e.preventDefault();
+  const query = $("#home-search").value.trim();
+  location.hash =
+    "/models?" + new URLSearchParams({ q: query, focus: "search" });
+});
 document.addEventListener("click", async (e) => {
+  const step = e.target.closest("[data-spotlight-step]");
+  if (step) {
+    const slides = $$("[data-spotlight-slide]");
+    const current = slides.findIndex((slide) => !slide.hidden);
+    const next =
+      (current + Number(step.dataset.spotlightStep) + slides.length) %
+      slides.length;
+    slides.forEach((slide, i) => {
+      slide.hidden = i !== next;
+    });
+    $("#spotlight-count").textContent =
+      `${String(next + 1).padStart(2, "0")} / 03 · ${$("h3", slides[next]).textContent}`;
+  }
   const dialogLink = e.target.closest('dialog a[href^="#/"]');
   if (dialogLink && location.hash === dialogLink.getAttribute("href")) {
     dismissDialog(dialogLink.closest("dialog"));
